@@ -1,5 +1,5 @@
 import test, { APIResponse, expect } from "@playwright/test"
-import { getPokeInfo, getPokeSpeciesInfo } from "../../services/pokeapi.service"
+import { getPokeInfo, getPokeSpeciesInfo } from "../../../services/pokeapi.service"
 
 
 /**
@@ -138,6 +138,48 @@ test.describe('PokeAPI', () => {
       expect(body.is_mythical).toBe(false)
       expect(body.pokedex_numbers[0].entry_number).toBe(25)
       expect(Array.isArray(body.pokedex_numbers)).toBe(true)
+          
+    })
+  })
+  /**
+   * Caso de prueba:
+   * Obtener información de especia un pokemon no válido
+   */
+  test('should get information for an invalid pokemon species', async ({ request}) => {
+
+    let response: APIResponse
+    let body
+
+    await test.step('Send request to get pokemon information', async () => {
+
+      response = await getPokeSpeciesInfo(
+        request,
+        'julian'
+      )
+
+      console.log("URL:", response.url())
+      console.log("STATUS:", response.status())
+      console.log("BODY:", await response.text())
+
+    })
+
+    await test.step('Validate HTTP status code', async () => {
+
+      expect(response.status()).toBe(404)
+
+    })
+
+    await test.step('Validate response structure', async () => {
+
+      body = await response.json()
+
+      console.log("Response body:", body)
+
+      /**
+       * Validamos
+       */
+      expect(body.status).toBe(404)
+      expect(body.message).toBe('Not Found')
           
     })
   })
